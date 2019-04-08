@@ -23,12 +23,12 @@ class A9Gdriver
 
         bool GPS_setStatus(bool enable);
         bool GPS_getStatus();
-    
-    private:
+
+    protected:
         Stream& _serial;
-        void dropRx();
-        void sendComm(String command);
-        bool catchRx(String needle);
+        void _dropRx();
+        void _sendComm(String command);
+        bool _catchRx(String needle);
 };
 
 #endif // A9G_AT_COMMANDS_H !def
