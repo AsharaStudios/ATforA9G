@@ -28,27 +28,29 @@ static void print_str(const char *str, int len);
 // MAIN LOGIC
 
 void setup(){
+    Serial.begin(115200);   //Debug (hardware) serial
+
     // A9G SETUP
     SerialA9G.begin(115200); // A9G Baud Rate
-    SerialA9G.listen();
-    while (!A9G.GPS_setStatus(1))
+    while (!A9G.GPS_setStatus(1)) {
+        Serial.println(F("Error while turning on GPS. Retrying..."));
         delay(2000);
+    }
 
     // TinyGPS NMEA Decoder Setup
-    Serial.begin(115200);   //Debug (hardware) serial
     SerialGPS.listen();
-    Serial.print("Testing TinyGPS library v. "); Serial.println(TinyGPS::library_version());
-    Serial.println("by Mikal Hart");
+    Serial.print(F("Testing TinyGPS library v. ")); Serial.println(TinyGPS::library_version());
+    Serial.println(F("by Mikal Hart"));
     Serial.println();
-    Serial.println("Sats HDOP Latitude  Longitude  Fix  Date       Time     Date Alt    Course Speed Card  Distance Course Card  Chars Sentences Checksum");
-    Serial.println("          (deg)     (deg)      Age                      Age  (m)    --- from GPS ----  ---- to London  ----  RX    RX        Fail");
-    Serial.println("-------------------------------------------------------------------------------------------------------------------------------------");
+    Serial.println(F("Sats HDOP Latitude  Longitude  Fix  Date       Time     Date Alt    Course Speed Card  Distance Course Card  Chars Sentences Checksum"));
+    Serial.println(F("          (deg)     (deg)      Age                      Age  (m)    --- from GPS ----  ---- to London  ----  RX    RX        Fail"));
+    Serial.println(F("-------------------------------------------------------------------------------------------------------------------------------------"));
     SerialGPS.begin(9600);  // A9G's Internal GPS Baud Rate
 }
 
 void loop(){
     float flat, flon;
-    unsigned long age, date, time, chars = 0;
+    unsigned long age, chars = 0;
     unsigned short sentences = 0, failed = 0;
     static const double LONDON_LAT = 51.508131, LONDON_LON = -0.128002;
 

@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.com/AsharaStudios/ATforA9G.svg?branch=master)](https://travis-ci.com/AsharaStudios/ATforA9G)
 
-Library to drive a Serial connected to an A9G Module. Based on the [GPRS Wiki (chinese)](https://wiki.ai-thinker.com/gprs) mentioned in the [official english documentation](https://ai-thinker-open.github.io/GPRS_C_SDK_DOC/en/).
+Library to drive a Serial connected to an A9G Module. Based on the [GPRS Wiki (chinese)](https://wiki.ai-thinker.com/gprs) mentioned in the [official english documentation](https://ai-thinker-open.github.io/GPRS_C_SDK_DOC/en/). And from there, based on the AT [Usage Examples (chinese)](https://wiki.ai-thinker.com/gprs/examples), [English Instruction Set (pdf)](https://wiki.ai-thinker.com/_media/gprs/b000at00a0_gprs_series_module_at_instruction_set_v1.0.pdf) and [Chinese Instruction Set (pdf)](https://wiki.ai-thinker.com/_media/gprs/at%E6%8C%87%E4%BB%A4%E9%9B%8620180825.pdf)
 
 ## Usage
 
