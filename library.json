@@ -1,0 +1,11 @@
+{
+    "name": "A9G AT Library",
+    "description": "Library to drive an Ai-Thinker A9G using AT Commands",
+    "keywords": "GPRS,GSM,A9G",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/AsharaStudios/ATforA9G"
+    },
+    "version": "0.0.0",
+    "frameworks": "*"
+}
