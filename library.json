@@ -7,5 +7,5 @@
         "url": "https://github.com/AsharaStudios/ATforA9G"
     },
     "version": "0.0.0",
-    "frameworks": "*"
+    "frameworks": "arduino"
 }
