@@ -3,6 +3,7 @@
  */
 
 #include <avr/pgmspace.h>
+#include <CayenneLPP.h>
 
 #include "a9gdriver.h"
 
@@ -32,7 +33,7 @@ void A9Gdriver::NET_attach(bool enable)
   _sendCommln(F("AT+CGATT=1"));
 }
 
-void A9Gdriver::NET_setPDP(int profile, const char * APN)
+void A9Gdriver::NET_setPDP(int profile, const char *APN)
 {
   _sendComm(F("AT+CGDCONT="));
   _sendComm(String(profile));
@@ -46,7 +47,7 @@ void A9Gdriver::NET_activatePDP(int profile, bool activate)
   _sendComm(F("AT+CGACT="));
   _sendComm(String(1));
   _sendComm(F(","));
-  _sendCommln(activate ? "1": "0");
+  _sendCommln(activate ? "1" : "0");
 }
 
 // ---------------------- HTTP FUNCTIONS --------------------------
@@ -66,7 +67,7 @@ void A9Gdriver::HTTP_sendPost(String url, String contentType, String bodyContent
 
 void A9Gdriver::MQTT_connect(const char *server, uint16_t port, String clientID, uint16_t aliveSeconds, bool cleanSession, const char *username, const char *password)
 {
-  _sendComm("AT+MQTTCONN=\"");
+  _sendComm(F("AT+MQTTCONN=\""));
   _sendLongString(server);
   _sendComm("\",");
   _sendComm(String(port));
@@ -83,7 +84,21 @@ void A9Gdriver::MQTT_connect(const char *server, uint16_t port, String clientID,
   _sendCommln("\"");
 }
 
-void A9Gdriver::MQTT_pub(const char * topic, String payload, uint8_t qos, bool dup, bool remain)
+void A9Gdriver::MQTT_pub(const char *topic, CayenneLPP payload, uint8_t qos, bool dup, bool remain)
+{
+  _sendComm(F("AT+MQTTPUB=\""));
+  _sendLongString(topic);
+  _sendComm("\",\"");
+  _sendBuffer(payload.getBuffer(), payload.getSize());
+  _sendComm("\",");
+  _sendComm(String(qos));
+  _sendComm(",");
+  _sendComm(String((uint8_t)dup));
+  _sendComm(",");
+  _sendCommln(String((uint8_t)remain));
+}
+
+void A9Gdriver::MQTT_pub(const char *topic, String payload, uint8_t qos, bool dup, bool remain)
 {
   _sendComm("AT+MQTTPUB=\"");
   _sendLongString(topic);
@@ -154,6 +169,20 @@ void A9Gdriver::_sendCommln(String command)
   _serial.println(command);
 }
 
+void A9Gdriver::_sendBuffer(const char *buffer, size_t size)
+{
+  char *out = buffer;
+
+  for (char *it = buffer; it < buffer + size; it += 4)
+    *out++ = "0123456789abcdef"[(it[0] != '0') * 8 +
+                                (it[1] != '0') * 4 +
+                                (it[2] != '0') * 2 +
+                                (it[3] != '0') * 1];
+
+  _serial.write(out, size / 4);
+  _serial.flush();
+}
+
 bool A9Gdriver::_catchRx(String needle)
 {
   needle.trim();
@@ -165,7 +194,7 @@ bool A9Gdriver::_catchRx(String needle)
 char tmpChar = 0;
 int k = 0;
 
-void A9Gdriver::_sendLongString(const char * str)
+void A9Gdriver::_sendLongString(const char *str)
 {
   for (k = 0; k < strlen_P(str); k++)
   {
