@@ -14,13 +14,13 @@ A9Gdriver::A9Gdriver(Stream& serial):
 
 bool A9Gdriver::GPS_setStatus(bool enable)
 {
-  _sendComm( enable ? F("AT+GPS=1") : F("AT+GPS=0") );
+  _sendCommln( enable ? F("AT+GPS=1") : F("AT+GPS=0") );
   return _catchRx(F("OK"));
 }
 
 bool A9Gdriver::GPS_getStatus()
 {
-  _sendComm(F("AT+GPS?"));
+  _sendCommln(F("AT+GPS?"));
   return true; // TODO: Implement this at all...
 }
 
@@ -28,51 +28,74 @@ bool A9Gdriver::GPS_getStatus()
 
 void A9Gdriver::NET_attach(bool enable)
 {
-  _sendComm(F("AT+CGATT=1"));
+  _sendCommln(F("AT+CGATT=1"));
 }
 
-void A9Gdriver::NET_setPDP()
+void A9Gdriver::NET_setPDP(int profile, String APN)
 {
-  _sendComm(F("AT+CGDCONT=1, \"IP\", \"CMNET\""));
+  _sendCommln("AT+CGDCONT=" + String(profile) +", \"IP\", \"" + APN + "\"");
 }
 
-void A9Gdriver::NET_activatePDP()
+void A9Gdriver::NET_activatePDP(int profile, bool activate)
 {
-  _sendComm(F("AT+CGACT=1,1"));
+  _sendCommln("AT+CGACT=" + String(activate) + "," + String(profile));
 }
 
 // ---------------------- HTTP FUNCTIONS --------------------------
 
 void A9Gdriver::HTTP_sendGet(String url)
 {
-  _sendComm("AT+HTTPGET=\"" + url + "\"");
+  _sendCommln("AT+HTTPGET=\"" + url + "\"");
 }
 
 void A9Gdriver::HTTP_sendPost(String url,String contentType, String bodyContent){
   // TODO: Verify this...
-  _sendComm("AT+HTTPPOST=\"" + url + "\", \"" + contentType + "\", \"" + bodyContent + "\"");
+  _sendCommln("AT+HTTPPOST=\"" + url + "\", \"" + contentType + "\", \"" + bodyContent + "\"");
 }
 
 // ---------------------- MQTT FUNCTIONS --------------------------
 
-void A9Gdriver::MQTT_connect(String server, uint16_t port, String clientID, uint16_t aliveSeconds, bool cleanSession, String username, String password)
+void A9Gdriver::MQTT_connect(char * server, uint16_t port, char * clientID, uint16_t aliveSeconds, bool cleanSession, char * username, char * password)
 {
-  _sendComm(" AT+MQTTCONN=\"" + server + "\"," + String(port) + ",\"" + clientID + "\"," + String(aliveSeconds) + "," + String((uint8_t)cleanSession) + ",\"" + username + "\",\"" + password + "\"");
-}
+  _sendComm("AT+MQTTCONN=\"");
+  _sendComm(server);
+  _sendComm("\",");
+  _sendComm(String(port));
+  _sendComm(",\"");
+  _sendComm(clientID);
+  _sendComm("\",");
+  _sendComm(String(aliveSeconds));
+  _sendComm(",");
+  _sendComm(String((uint8_t)cleanSession));
+  _sendComm(",\"");
+  _sendComm(username);
+  _sendComm("\",\"");
+  _sendComm(password);
+  _sendCommln("\"");
+  }
 
-void A9Gdriver::MQTT_pub(String topic, String payload, uint8_t qos, bool dup, bool remain)
+void A9Gdriver::MQTT_pub(char * topic, String payload, uint8_t qos, bool dup, bool remain)
 {
-  _sendComm("AT+MQTTPUB=\"" + topic + "\",\"" + payload + "\"," + String(qos) + "," + String((uint8_t)dup) + "," + String((uint8_t)remain));
+  _sendComm("AT+MQTTPUB=\"");
+  _sendComm(topic);
+  _sendComm("\",\"");
+  _sendComm(payload);
+  _sendComm("\",");
+  _sendComm(String(qos));
+  _sendComm(",");
+  _sendComm(String((uint8_t)dup));
+  _sendComm(",");
+  _sendCommln(String((uint8_t)remain));
 }
 
 void A9Gdriver::MQTT_sub(String topic, bool sub, uint8_t qos)
 {
-  _sendComm("AT+MQTTSUB=\"" + topic + "\"," + String((uint8_t)sub) + "," + String(qos));
+  _sendCommln("AT+MQTTSUB=\"" + topic + "\"," + String((uint8_t)sub) + "," + String(qos));
 }
 
 void A9Gdriver::MQTT_disconnect()
 {
-  _sendComm(F("AT+MQTTDISCONN"));
+  _sendCommln(F("AT+MQTTDISCONN"));
 }
 
 // -------------------- GENERAL FUNCTIONS -------------------------
@@ -85,11 +108,11 @@ void A9Gdriver::sendRst(A9G_shdn_level_t type)
   switch (type)
   {
     case RESTART:
-      _sendComm(F("AT+RST=1"));
+      _sendCommln(F("AT+RST=1"));
       break;
 
     case SHUTDOWN:
-      _sendComm(F("AT+RST=2"));
+      _sendCommln(F("AT+RST=2"));
       break;
 
     default:
@@ -103,10 +126,24 @@ void A9Gdriver::_dropRx()
     _serial.read();
 }
 
+void A9Gdriver::_flushTx()
+{
+    _serial.flush();
+}
+
+
 void A9Gdriver::_sendComm(String command)
 {
   _dropRx();
+  _serial.print(command);
+  _flushTx();
+}
+
+void A9Gdriver::_sendCommln(String command)
+{
+  _dropRx();
   _serial.println(command);
+  _flushTx();
 }
 
 bool A9Gdriver::_catchRx(String needle)
