@@ -203,7 +203,7 @@ class A9Gdriver
         // GPRS FUNCTIONS
 
         void NET_attach(bool enable); // CGATT
-        void NET_setPDP(int profile, String APN);  // CGDCONT
+        void NET_setPDP(int profile, const char * APN);  // CGDCONT
         void NET_activatePDP(int profile, bool activate); // CGACT
 
         // HTTP FUNCTIONS
@@ -213,8 +213,8 @@ class A9Gdriver
 
         // MQTT FUNCTIONS
 
-        void MQTT_connect(char * server, uint16_t port, char * clientID, uint16_t aliveSeconds, bool cleanSession, char * username, char * password);    // MQTTCONN
-        void MQTT_pub(char * topic, String  payload, uint8_t qos, bool dup, bool remain);    // MQTTPUB
+        void MQTT_connect(const char * server, uint16_t port, String clientID, uint16_t aliveSeconds, bool cleanSession, const char * username, const char * password);    // MQTTCONN
+        void MQTT_pub(const char * topic, String payload, uint8_t qos, bool dup, bool remain);    // MQTTPUB
         void MQTT_sub(String topic, bool sub, uint8_t qos);    // MQTTSUB
         void MQTT_disconnect(); // MQTTDISCONN
 
@@ -224,6 +224,7 @@ class A9Gdriver
         void _flushTx();
         void _sendComm(String command); // AT+
         void _sendCommln(String command); // AT+
+        void _sendLongString(const char * str);
         bool _catchRx(String needle);
 };
 

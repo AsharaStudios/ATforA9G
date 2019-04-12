@@ -2,10 +2,11 @@
  * Ai-Thinker A9(G) Library using AT Commands - Implementation
  */
 
+#include <avr/pgmspace.h>
+
 #include "a9gdriver.h"
 
-A9Gdriver::A9Gdriver(Stream& serial):
-  _serial(serial)
+A9Gdriver::A9Gdriver(Stream &serial) : _serial(serial)
 {
   _serial.setTimeout(100);
 }
@@ -14,7 +15,7 @@ A9Gdriver::A9Gdriver(Stream& serial):
 
 bool A9Gdriver::GPS_setStatus(bool enable)
 {
-  _sendCommln( enable ? F("AT+GPS=1") : F("AT+GPS=0") );
+  _sendCommln(enable ? F("AT+GPS=1") : F("AT+GPS=0"));
   return _catchRx(F("OK"));
 }
 
@@ -31,14 +32,21 @@ void A9Gdriver::NET_attach(bool enable)
   _sendCommln(F("AT+CGATT=1"));
 }
 
-void A9Gdriver::NET_setPDP(int profile, String APN)
+void A9Gdriver::NET_setPDP(int profile, const char * APN)
 {
-  _sendCommln("AT+CGDCONT=" + String(profile) +", \"IP\", \"" + APN + "\"");
+  _sendComm(F("AT+CGDCONT="));
+  _sendComm(String(profile));
+  _sendComm(F(", \"IP\", \""));
+  _sendLongString(APN);
+  _sendCommln(F("\""));
 }
 
 void A9Gdriver::NET_activatePDP(int profile, bool activate)
 {
-  _sendCommln("AT+CGACT=" + String(activate) + "," + String(profile));
+  _sendComm(F("AT+CGACT="));
+  _sendComm(String(1));
+  _sendComm(F(","));
+  _sendCommln(activate ? "1": "0");
 }
 
 // ---------------------- HTTP FUNCTIONS --------------------------
@@ -48,17 +56,18 @@ void A9Gdriver::HTTP_sendGet(String url)
   _sendCommln("AT+HTTPGET=\"" + url + "\"");
 }
 
-void A9Gdriver::HTTP_sendPost(String url,String contentType, String bodyContent){
+void A9Gdriver::HTTP_sendPost(String url, String contentType, String bodyContent)
+{
   // TODO: Verify this...
   _sendCommln("AT+HTTPPOST=\"" + url + "\", \"" + contentType + "\", \"" + bodyContent + "\"");
 }
 
 // ---------------------- MQTT FUNCTIONS --------------------------
 
-void A9Gdriver::MQTT_connect(char * server, uint16_t port, char * clientID, uint16_t aliveSeconds, bool cleanSession, char * username, char * password)
+void A9Gdriver::MQTT_connect(const char *server, uint16_t port, String clientID, uint16_t aliveSeconds, bool cleanSession, const char *username, const char *password)
 {
   _sendComm("AT+MQTTCONN=\"");
-  _sendComm(server);
+  _sendLongString(server);
   _sendComm("\",");
   _sendComm(String(port));
   _sendComm(",\"");
@@ -68,16 +77,16 @@ void A9Gdriver::MQTT_connect(char * server, uint16_t port, char * clientID, uint
   _sendComm(",");
   _sendComm(String((uint8_t)cleanSession));
   _sendComm(",\"");
-  _sendComm(username);
+  _sendLongString(username);
   _sendComm("\",\"");
-  _sendComm(password);
+  _sendLongString(password);
   _sendCommln("\"");
-  }
+}
 
-void A9Gdriver::MQTT_pub(char * topic, String payload, uint8_t qos, bool dup, bool remain)
+void A9Gdriver::MQTT_pub(const char * topic, String payload, uint8_t qos, bool dup, bool remain)
 {
   _sendComm("AT+MQTTPUB=\"");
-  _sendComm(topic);
+  _sendLongString(topic);
   _sendComm("\",\"");
   _sendComm(payload);
   _sendComm("\",");
@@ -101,36 +110,36 @@ void A9Gdriver::MQTT_disconnect()
 // -------------------- GENERAL FUNCTIONS -------------------------
 
 void A9Gdriver::init()
-{}
+{
+}
 
 void A9Gdriver::sendRst(A9G_shdn_level_t type)
 {
   switch (type)
   {
-    case RESTART:
-      _sendCommln(F("AT+RST=1"));
-      break;
+  case RESTART:
+    _sendCommln(F("AT+RST=1"));
+    break;
 
-    case SHUTDOWN:
-      _sendCommln(F("AT+RST=2"));
-      break;
+  case SHUTDOWN:
+    _sendCommln(F("AT+RST=2"));
+    break;
 
-    default:
-      break;
+  default:
+    break;
   }
 }
 
 void A9Gdriver::_dropRx()
 {
-  while(_serial.available())
+  while (_serial.available())
     _serial.read();
 }
 
 void A9Gdriver::_flushTx()
 {
-    _serial.flush();
+  _serial.flush();
 }
-
 
 void A9Gdriver::_sendComm(String command)
 {
@@ -143,7 +152,6 @@ void A9Gdriver::_sendCommln(String command)
 {
   _dropRx();
   _serial.println(command);
-  _flushTx();
 }
 
 bool A9Gdriver::_catchRx(String needle)
@@ -152,4 +160,16 @@ bool A9Gdriver::_catchRx(String needle)
   String response = _serial.readStringUntil('\n');
   response.trim();
   return response.equals(needle);
+}
+
+char tmpChar = 0;
+int k = 0;
+
+void A9Gdriver::_sendLongString(const char * str)
+{
+  for (k = 0; k < strlen_P(str); k++)
+  {
+    tmpChar = pgm_read_byte_near(str + k);
+    _serial.print(tmpChar);
+  }
 }
