@@ -84,20 +84,6 @@ void A9Gdriver::MQTT_connect(const char *server, uint16_t port, String clientID,
   _sendCommln("\"");
 }
 
-void A9Gdriver::MQTT_pub(const char *topic, CayenneLPP payload, uint8_t qos, bool dup, bool remain)
-{
-  _sendComm(F("AT+MQTTPUB=\""));
-  _sendLongString(topic);
-  _sendComm("\",\"");
-  _sendBuffer(payload.getBuffer(), payload.getSize());
-  _sendComm("\",");
-  _sendComm(String(qos));
-  _sendComm(",");
-  _sendComm(String((uint8_t)dup));
-  _sendComm(",");
-  _sendCommln(String((uint8_t)remain));
-}
-
 void A9Gdriver::MQTT_pub(const char *topic, String payload, uint8_t qos, bool dup, bool remain)
 {
   _sendComm("AT+MQTTPUB=\"");

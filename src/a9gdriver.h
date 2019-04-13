@@ -7,7 +7,6 @@
 
 #include <Arduino.h>
 #include <stdbool.h>
-#include <CayenneLPP.h>
 
 typedef enum {
     RESTART,
@@ -216,7 +215,6 @@ class A9Gdriver
 
         void MQTT_connect(const char * server, uint16_t port, String clientID, uint16_t aliveSeconds, bool cleanSession, const char * username, const char * password);    // MQTTCONN
         void MQTT_pub(const char * topic, String payload, uint8_t qos, bool dup, bool remain);    // MQTTPUB
-        void MQTT_pub(const char * topic, CayenneLPP payload, uint8_t qos, bool dup, bool remain);    // MQTTPUB
         void MQTT_sub(String topic, bool sub, uint8_t qos);    // MQTTSUB
         void MQTT_disconnect(); // MQTTDISCONN
 

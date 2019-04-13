@@ -12,6 +12,9 @@
 SoftwareSerial SerialA9G(A9Gtx,A9Grx);
 A9Gdriver A9G(SerialA9G);
 
+// Network Settings
+const PROGMEM char APN[] = "internet.comcel.com.co";
+
 // MAIN LOGIC
 // Based on https://wiki.ai-thinker.com/gprs/examples#mqtt
 
@@ -19,11 +22,26 @@ void setup(){
     Serial.begin(9600);
     SerialA9G.begin(115200); // A9G Baud Rate
 
+    // Cellular Network Settings
     A9G.NET_attach(true);
-    A9G.NET_setPDP();
-    A9G.NET_activatePDP();
+    delay(5000);
+    A9G.NET_setPDP(1,APN);
+    delay(1000);
+    A9G.NET_activatePDP(1,true);
+    delay(5000);
 
-    A9G.MQTT_connect("www.anthinkerwx.com",1883,"12345",120,0,"Ai-thinker","123456");
+    Serial.println("Setting MQTT up");
+
+    // MQTT Settings
+    A9G.MQTT_connect(
+        "www.anthinkerwx.com", // Server
+        1883,   // Port
+        "12345",    // Client ID
+        120,    // Alive
+        0,      // Clean connection not required
+        "Ai-thinker",   // User
+        "123456"    // Password
+    );
 }
 
 void loop(){
