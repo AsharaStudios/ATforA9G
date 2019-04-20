@@ -54,13 +54,21 @@ void A9Gdriver::NET_activatePDP(int profile, bool activate)
 
 void A9Gdriver::HTTP_sendGet(String url)
 {
-  _sendCommln("AT+HTTPGET=\"" + url + "\"");
+  _sendComm(F("AT+HTTPGET=\""));
+  _sendComm(url);
+  _sendCommln(F("\""));
 }
 
 void A9Gdriver::HTTP_sendPost(String url, String contentType, String bodyContent)
 {
   // TODO: Verify this...
-  _sendCommln("AT+HTTPPOST=\"" + url + "\", \"" + contentType + "\", \"" + bodyContent + "\"");
+  _sendComm(F("AT+HTTPPOST=\""));
+  _sendComm(url);
+  _sendComm(F("\", \""));
+  _sendComm(contentType);
+  _sendComm(F("\", \""));
+  _sendComm(bodyContent);
+  _sendCommln(F("\""));
 }
 
 // ---------------------- MQTT FUNCTIONS --------------------------
@@ -69,38 +77,43 @@ void A9Gdriver::MQTT_connect(const char *server, uint16_t port, String clientID,
 {
   _sendComm(F("AT+MQTTCONN=\""));
   _sendLongString(server);
-  _sendComm("\",");
+  _sendComm(F("\","));
   _sendComm(String(port));
-  _sendComm(",\"");
+  _sendComm(F(",\""));
   _sendComm(clientID);
-  _sendComm("\",");
+  _sendComm(F("\","));
   _sendComm(String(aliveSeconds));
-  _sendComm(",");
+  _sendComm(F(","));
   _sendComm(String((uint8_t)cleanSession));
-  _sendComm(",\"");
+  _sendComm(F(",\""));
   _sendLongString(username);
-  _sendComm("\",\"");
+  _sendComm(F("\",\""));
   _sendLongString(password);
-  _sendCommln("\"");
+  _sendCommln(F("\""));
 }
 
 void A9Gdriver::MQTT_pub(const char *topic, String payload, uint8_t qos, bool dup, bool remain)
 {
-  _sendComm("AT+MQTTPUB=\"");
+  _sendComm(F("AT+MQTTPUB=\""));
   _sendLongString(topic);
-  _sendComm("\",\"");
+  _sendComm(F("\",\""));
   _sendComm(payload);
-  _sendComm("\",");
+  _sendComm(F("\","));
   _sendComm(String(qos));
-  _sendComm(",");
+  _sendComm(F(","));
   _sendComm(String((uint8_t)dup));
-  _sendComm(",");
+  _sendComm(F(","));
   _sendCommln(String((uint8_t)remain));
 }
 
 void A9Gdriver::MQTT_sub(String topic, bool sub, uint8_t qos)
 {
-  _sendCommln("AT+MQTTSUB=\"" + topic + "\"," + String((uint8_t)sub) + "," + String(qos));
+  _sendComm(F("AT+MQTTSUB=\""));
+  _sendComm(topic);
+  _sendComm(F("\","));
+  _sendComm(String((uint8_t)sub));
+  _sendComm(F(","));
+  _sendCommln(String(qos));
 }
 
 void A9Gdriver::MQTT_disconnect()
@@ -112,6 +125,7 @@ void A9Gdriver::MQTT_disconnect()
 
 void A9Gdriver::init()
 {
+
 }
 
 void A9Gdriver::sendRst(A9G_shdn_level_t type)
@@ -157,9 +171,9 @@ void A9Gdriver::_sendCommln(String command)
 
 void A9Gdriver::_sendBuffer(const char *buffer, size_t size)
 {
-  char *out = buffer;
+  char *out = (char *)buffer;
 
-  for (char *it = buffer; it < buffer + size; it += 4)
+  for (char *it = out; it < buffer + size; it += 4)
     *out++ = "0123456789abcdef"[(it[0] != '0') * 8 +
                                 (it[1] != '0') * 4 +
                                 (it[2] != '0') * 2 +
