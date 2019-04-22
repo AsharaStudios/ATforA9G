@@ -1,5 +1,5 @@
 /*
- * Utilitary functions
+ * Utilitary and inner-working functions
  */
 
 #include <avr/pgmspace.h>
@@ -13,7 +13,6 @@ A9Gdriver::A9Gdriver(Stream &serial) : _serial(serial)
 
 void A9Gdriver::init()
 {
-
 }
 
 void A9Gdriver::_dropRx()

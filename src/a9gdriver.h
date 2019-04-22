@@ -222,8 +222,8 @@ class A9Gdriver
         Stream& _serial;
         void _dropRx();
         void _flushTx();
-        void _sendComm(String command); // AT+
-        void _sendCommln(String command); // AT+
+        void _sendComm(String command);
+        void _sendCommln(String command);
         void _sendLongString(const char * str);
         void _sendBuffer(const char * buffer, size_t size);
         bool _catchRx(String needle);

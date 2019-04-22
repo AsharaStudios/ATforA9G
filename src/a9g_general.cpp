@@ -1,5 +1,6 @@
 /*
  * Only general AT command interface functions
+ * (not inner-working functions!!)
  */
 
 #include "a9gdriver.h"
