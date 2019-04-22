@@ -8,7 +8,7 @@ void A9Gdriver::HTTP_sendGet(String url)
 {
   _sendComm(F("AT+HTTPGET=\""));
   _sendComm(url);
-  _sendCommln(F("\""));
+  _sendCommEnd(F("\""));
 }
 
 void A9Gdriver::HTTP_sendPost(String url, String contentType, String bodyContent)
@@ -20,5 +20,5 @@ void A9Gdriver::HTTP_sendPost(String url, String contentType, String bodyContent
   _sendComm(contentType);
   _sendComm(F("\", \""));
   _sendComm(bodyContent);
-  _sendCommln(F("\""));
+  _sendCommEnd(F("\""));
 }

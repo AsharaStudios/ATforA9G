@@ -24,7 +24,7 @@ cache:
     - "~/.platformio"
 
 env:
-  - PLATFORMIO_CI_SRC=examples/gps.cpp
+  - PLATFORMIO_CI_SRC=examples/gps_dedicatedPins.cpp
   - PLATFORMIO_CI_SRC=examples/mqtt.cpp
   # - PLATFORMIO_CI_SRC=path/to/test/file.c
   # - PLATFORMIO_CI_SRC=examples/file.ino

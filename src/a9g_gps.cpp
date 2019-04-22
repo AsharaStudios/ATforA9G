@@ -6,12 +6,12 @@
 
 bool A9Gdriver::GPS_setStatus(bool enable)
 {
-  _sendCommln(enable ? F("AT+GPS=1") : F("AT+GPS=0"));
-  return _catchRx(F("OK"));
+  _sendCommEnd(enable ? F("AT+GPS=1") : F("AT+GPS=0"));
+  return _waitForRx(F("OK"));
 }
 
 bool A9Gdriver::GPS_getStatus()
 {
-  _sendCommln(F("AT+GPS?"));
+  _sendCommEnd(F("AT+GPS?"));
   return true; // TODO: Implement this at all...
 }

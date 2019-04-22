@@ -6,7 +6,7 @@
 
 void A9Gdriver::NET_attach(bool enable)
 {
-  _sendCommln(F("AT+CGATT=1"));
+  _sendCommEnd(F("AT+CGATT=1"));
 }
 
 void A9Gdriver::NET_setPDP(int profile, const char *APN)
@@ -15,7 +15,7 @@ void A9Gdriver::NET_setPDP(int profile, const char *APN)
   _sendComm(String(profile));
   _sendComm(F(", \"IP\", \""));
   _sendLongString(APN);
-  _sendCommln(F("\""));
+  _sendCommEnd(F("\""));
 }
 
 void A9Gdriver::NET_activatePDP(int profile, bool activate)
@@ -23,5 +23,5 @@ void A9Gdriver::NET_activatePDP(int profile, bool activate)
   _sendComm(F("AT+CGACT="));
   _sendComm(String(1));
   _sendComm(F(","));
-  _sendCommln(activate ? "1" : "0");
+  _sendCommEnd(activate ? "1" : "0");
 }

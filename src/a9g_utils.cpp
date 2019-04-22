@@ -1,9 +1,6 @@
 /*
  * Utilitary and inner-working functions
  */
-
-#include <avr/pgmspace.h>
-
 #include "a9gdriver.h"
 
 A9Gdriver::A9Gdriver(Stream &serial) : _serial(serial)
@@ -13,6 +10,8 @@ A9Gdriver::A9Gdriver(Stream &serial) : _serial(serial)
 
 void A9Gdriver::init()
 {
+  ATmode(true);
+  A_setEchoMode(false);
 }
 
 void A9Gdriver::_dropRx()
@@ -33,10 +32,10 @@ void A9Gdriver::_sendComm(String command)
   _flushTx();
 }
 
-void A9Gdriver::_sendCommln(String command)
+void A9Gdriver::_sendCommEnd(String command)
 {
-  _dropRx();
-  _serial.println(command);
+  _sendComm(command);
+  _serial.print(F("\r"));
 }
 
 void A9Gdriver::_sendBuffer(const char *buffer, size_t size)
@@ -53,7 +52,7 @@ void A9Gdriver::_sendBuffer(const char *buffer, size_t size)
   _serial.flush();
 }
 
-bool A9Gdriver::_catchRx(String needle)
+bool A9Gdriver::_waitForRx(String needle,unsigned long timeout)
 {
   needle.trim();
   String response = _serial.readStringUntil('\n');
@@ -61,14 +60,11 @@ bool A9Gdriver::_catchRx(String needle)
   return response.equals(needle);
 }
 
-char tmpChar = 0;
-int k = 0;
-
 void A9Gdriver::_sendLongString(const char *str)
 {
-  for (k = 0; k < strlen_P(str); k++)
+  for (int k = 0; k < strlen_P(str); k++)
   {
-    tmpChar = pgm_read_byte_near(str + k);
+    char tmpChar = pgm_read_byte_near(str + k);
     _serial.print(tmpChar);
   }
 }

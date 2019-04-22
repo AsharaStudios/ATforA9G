@@ -20,7 +20,7 @@ void A9Gdriver::MQTT_connect(const char *server, uint16_t port, String clientID,
   _sendLongString(username);
   _sendComm(F("\",\""));
   _sendLongString(password);
-  _sendCommln(F("\""));
+  _sendCommEnd(F("\""));
 }
 
 void A9Gdriver::MQTT_pub(const char *topic, String payload, uint8_t qos, bool dup, bool remain)
@@ -34,7 +34,7 @@ void A9Gdriver::MQTT_pub(const char *topic, String payload, uint8_t qos, bool du
   _sendComm(F(","));
   _sendComm(String((uint8_t)dup));
   _sendComm(F(","));
-  _sendCommln(String((uint8_t)remain));
+  _sendCommEnd(String((uint8_t)remain));
 }
 
 void A9Gdriver::MQTT_sub(String topic, bool sub, uint8_t qos)
@@ -44,10 +44,10 @@ void A9Gdriver::MQTT_sub(String topic, bool sub, uint8_t qos)
   _sendComm(F("\","));
   _sendComm(String((uint8_t)sub));
   _sendComm(F(","));
-  _sendCommln(String(qos));
+  _sendCommEnd(String(qos));
 }
 
 void A9Gdriver::MQTT_disconnect()
 {
-  _sendCommln(F("AT+MQTTDISCONN"));
+  _sendCommEnd(F("AT+MQTTDISCONN"));
 }

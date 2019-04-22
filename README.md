@@ -41,3 +41,7 @@ void setup(){
 }
 
 ```
+
+## To keep in mind
+
+Currently there is no echo handling of AT commands, so the echoes are being disabled because the library disable it by sending `ATE0`. This means that after using this library, you want to test your A9(G) back on terminal, you will see that as you type the AT commands you will **not** see what you have typed: you will only see the AT corresponding replies (yes, press "Intro", it will work even if you no saw what you typed), *unless* you enable the echoes back by sending `ATE1`.

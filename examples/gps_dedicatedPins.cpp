@@ -7,13 +7,13 @@
 #include <TinyGPS.h>
 #include <SoftwareSerial.h>
 
-// Connect to HST pins on the A9(G)
+// Connect to A9(G) RX/TX (not HST nor GPS) pins
 #define A9Gtx 4
 #define A9Grx 5
 SoftwareSerial SerialA9G(A9Gtx,A9Grx);
 A9Gdriver A9G(SerialA9G);
 
-// Connect to GPS pins on the A9(G)
+// Connect to A9(G) GPS pins
 #define GPStx 6
 #define GPSrx 7
 SoftwareSerial SerialGPS(GPStx,GPSrx);
