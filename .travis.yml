@@ -35,4 +35,4 @@ install:
   - platformio update
 
 script:
-  - platformio ci --lib="." -Cplatformio.ini
+  - platformio ci --lib="." -c platformio.ini
